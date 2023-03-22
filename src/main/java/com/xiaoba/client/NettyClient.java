@@ -27,11 +27,15 @@ public class NettyClient {
                 .group(workerGroup)
                 //指定IO模型
                 .channel(NioServerSocketChannel.class)
-                //IO逻辑处理
+                //IO逻辑处理,客户端相关数据的读写
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) {
-
+                        /*
+                        * 1、pipeline()返回这条连接相关逻辑的处理链，采用责任链模式。
+                        * 2、addLost()添加一个逻辑处理器为的就是在客户端建立连接成功 之后，向服务端写数据
+                        * */
+                        ch.pipeline().addLast(new FirstClientHandler());
                     }
                 });
         //建立连接，通过.addListener监听是否连接成功，因为connect异步、返回一个future
@@ -55,7 +59,7 @@ public class NettyClient {
             } else {
                 //第几次重连
                 int order = (MAX_RETRY - retry) + 1;
-                //本次重连的间隔
+                //本次重连的间隔，1、2、4、8秒
                 int delay = 1 << order;
                 System.out.println(new Date() + "连接失败，第" + order + "次重连...");
                 bootstrap.config().group().schedule(() -> connect(bootstrap, host, port, retry - 1), delay, TimeUnit.SECONDS);
