@@ -1,5 +1,6 @@
-package com.xiaoba.protocol.command;
+package com.xiaoba.protocol.request;
 
+import com.xiaoba.protocol.Packet;
 import lombok.Data;
 
 import static com.xiaoba.protocol.command.Command.LOGIN_REQUEST;
@@ -12,7 +13,7 @@ import static com.xiaoba.protocol.command.Command.LOGIN_REQUEST;
 
 @Data
 public class LoginRequestPacket extends Packet {
-    private Integer userId;
+    private String userId;
     private String username;
     private String password;
 

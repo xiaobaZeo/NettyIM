@@ -1,4 +1,4 @@
-package com.xiaoba.protocol.command;
+package com.xiaoba.protocol;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.xiaoba.protocol.command;
+package com.xiaoba.protocol;
 
 /*
  * @Author:xiaoba
@@ -6,6 +6,7 @@ package com.xiaoba.protocol.command;
  * @Description : 封装二进制
  */
 
+import com.xiaoba.protocol.request.LoginRequestPacket;
 import com.xiaoba.serialize.Serializer;
 import com.xiaoba.serialize.impl.JSONSerializer;
 import io.netty.buffer.ByteBuf;
@@ -17,7 +18,10 @@ import java.util.HashMap;
 import static com.xiaoba.protocol.command.Command.LOGIN_REQUEST;
 
 public class PacketCodeC {
+
     private static final int MAGIC_NUMBER = 0x12345678;
+    public static final PacketCodeC INSTANCE = new PacketCodeC();
+
     private static final Map<Byte, Class<? extends Packet>> packetTypeMap;
     private static final Map<Byte, Serializer> serializerMap;
 
@@ -30,10 +34,10 @@ public class PacketCodeC {
         serializerMap.put(serializer.getSerializerAlgorithm(), serializer);
     }
 
-    public ByteBuf encode(Packet packet) {
+    public ByteBuf encode(ByteBufAllocator byteBufAllocator, Packet packet) {
         //1、创建ByteBuf对象、调用Netty分配器创建，ioBuffer()返回适配io读写相关内存，他尽可能创建一个直接内存，可以理解不收jvm堆管理的内存空间，写入io缓冲区的效果更好
-        ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
-
+//        ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
+        ByteBuf byteBuf = byteBufAllocator.ioBuffer();
         //2、序列化Java对象
         byte[] bytes = Serializer.DEFAULT.serialize(packet);
 
@@ -75,8 +79,9 @@ public class PacketCodeC {
 
         byteBuf.readBytes(bytes);
 
-
+        //根据指令获取对应的登录请求包  可以放入 子类 和 本身 T
         Class<? extends Packet> requestType = getRequestType(command);
+        //根据序列化算法获取对应的序列化对象
         Serializer serializer = getSerializer(serializeAlgorithm);
 
         if (requestType != null && serializer != null) {
