@@ -30,7 +30,7 @@ public class NettyServer {
          * */
         serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).childHandler(new ChannelInitializer<NioSocketChannel>() {
             protected void initChannel(NioSocketChannel ch) {
-
+                ch.pipeline().addLast(new FirstServerHandler());
             }
         });
         /*

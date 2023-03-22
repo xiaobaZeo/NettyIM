@@ -30,6 +30,11 @@ public class FirstClientHandler extends ChannelInboundHandlerAdapter {
         ctx.channel().writeAndFlush(byteBuf);
     }
 
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        ByteBuf byteBuf = (ByteBuf) msg;
+        System.out.println(new Date() + "：客户端读到数据 -> "+byteBuf.toString(Charset.forName("utf-8")));
+    }
     //写数据的逻辑如下：
 
     private ByteBuf getByteBuf(ChannelHandlerContext ctx) {
