@@ -7,7 +7,13 @@ package com.xiaoba.client;
  */
 
 import com.sun.org.apache.regexp.internal.RE;
+import com.xiaoba.protocol.PacketCodeC;
+import com.xiaoba.protocol.request.MessageRequestPacket;
+import com.xiaoba.util.LoginUtil;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -16,6 +22,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.util.Date;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class NettyClient {
@@ -37,9 +44,9 @@ public class NettyClient {
                     @Override
                     public void initChannel(SocketChannel ch) {
                         /*
-                        * 1、pipeline()返回这条连接相关逻辑的处理链，采用责任链模式。
-                        * 2、addLost()添加一个逻辑处理器为的就是在客户端建立连接成功 之后，向服务端写数据
-                        * */
+                         * 1、pipeline()返回这条连接相关逻辑的处理链，采用责任链模式。
+                         * 2、addLost()添加一个逻辑处理器为的就是在客户端建立连接成功 之后，向服务端写数据
+                         * */
                         ch.pipeline().addLast(new ClientHandler());
                     }
                 });
@@ -58,6 +65,9 @@ public class NettyClient {
     private static void connect(Bootstrap bootstrap, String host, final int port, int retry) {
         bootstrap.connect(host, port).addListener(future -> {
             if (future.isSuccess()) {
+                Channel channel = ((ChannelFuture) future).channel();
+                //连接成功启动控制台线程
+                startConsoleThread(channel);
                 System.out.println("连接成功");
             } else if (retry == 0) {
                 System.err.println("重试次数用完，放弃连接！");
@@ -70,5 +80,22 @@ public class NettyClient {
                 bootstrap.config().group().schedule(() -> connect(bootstrap, host, port, retry - 1), delay, TimeUnit.SECONDS);
             }
         });
+    }
+
+    private static void startConsoleThread(Channel channel) {
+        new Thread(() -> {
+            while (!Thread.interrupted()) {
+                if (LoginUtil.hasLogin(channel)) {
+                    System.out.println("输入消息发送至服务端: ");
+                    Scanner sc = new Scanner(System.in);
+                    String line = sc.nextLine();
+
+                    MessageRequestPacket packet = new MessageRequestPacket();
+                    packet.setMessage(line);
+                    ByteBuf byteBuf = PacketCodeC.INSTANCE.encode(channel.alloc(), packet);
+                    channel.writeAndFlush(byteBuf);
+                }
+            }
+        }).start();
     }
 }

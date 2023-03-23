@@ -7,6 +7,9 @@ package com.xiaoba.protocol;
  */
 
 import com.xiaoba.protocol.request.LoginRequestPacket;
+import com.xiaoba.protocol.request.MessageRequestPacket;
+import com.xiaoba.protocol.response.LoginResponsePacket;
+import com.xiaoba.protocol.response.MessageResponsePacket;
 import com.xiaoba.serialize.Serializer;
 import com.xiaoba.serialize.impl.JSONSerializer;
 import io.netty.buffer.ByteBuf;
@@ -15,19 +18,32 @@ import io.netty.buffer.ByteBufAllocator;
 import java.util.Map;
 import java.util.HashMap;
 
-import static com.xiaoba.protocol.command.Command.LOGIN_REQUEST;
+import static com.xiaoba.protocol.command.Command.*;
 
 public class PacketCodeC {
 
     private static final int MAGIC_NUMBER = 0x12345678;
     public static final PacketCodeC INSTANCE = new PacketCodeC();
 
-    private static final Map<Byte, Class<? extends Packet>> packetTypeMap;
-    private static final Map<Byte, Serializer> serializerMap;
+    private final Map<Byte, Class<? extends Packet>> packetTypeMap;
+    private final Map<Byte, Serializer> serializerMap;
 
-    static {
+    //    static {
+//        packetTypeMap = new HashMap<>();
+//        packetTypeMap.put(LOGIN_REQUEST, LoginRequestPacket.class);
+//
+//        serializerMap = new HashMap<>();
+//        Serializer serializer = new JSONSerializer();
+//        serializerMap.put(serializer.getSerializerAlgorithm(), serializer);
+//    }
+
+    //初始化不同指令的map！！！
+    private PacketCodeC() {
         packetTypeMap = new HashMap<>();
         packetTypeMap.put(LOGIN_REQUEST, LoginRequestPacket.class);
+        packetTypeMap.put(LOGIN_RESPONSE, LoginResponsePacket.class);
+        packetTypeMap.put(MESSAGE_REQUEST, MessageRequestPacket.class);
+        packetTypeMap.put(MESSAGE_RESPONSE, MessageResponsePacket.class);
 
         serializerMap = new HashMap<>();
         Serializer serializer = new JSONSerializer();

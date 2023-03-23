@@ -10,6 +10,8 @@ import com.xiaoba.protocol.Packet;
 import com.xiaoba.protocol.PacketCodeC;
 import com.xiaoba.protocol.request.LoginRequestPacket;
 import com.xiaoba.protocol.response.LoginResponsePacket;
+import com.xiaoba.protocol.response.MessageResponsePacket;
+import com.xiaoba.util.LoginUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -44,14 +46,20 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         ByteBuf byteBuf = (ByteBuf) msg;
         //拿到msg，进行解码操作
         Packet packet = PacketCodeC.INSTANCE.decode(byteBuf);
-
+        //如果是服务端返回的登录是否成功信息内容
         if (packet instanceof LoginResponsePacket) {
             LoginResponsePacket loginResponsePacket = (LoginResponsePacket) packet;
             if (loginResponsePacket.isSuccess()) {
                 System.out.println(new Date() + "客户端登录成功");
+                LoginUtil.markAsLogin(ctx.channel());
             } else {
                 System.out.println(new Date() + "客户端登录失败，原因是:" + loginResponsePacket.getReason());
             }
+        }
+        //如果是服务端返回的消息内容
+        else if (packet instanceof MessageResponsePacket) {
+            MessageResponsePacket messageResponsePacket = (MessageResponsePacket) packet;
+            System.out.println(new Date() + "：收到服务端信息" + messageResponsePacket.getMessage());
         }
     }
 }
