@@ -9,6 +9,7 @@ package com.xiaoba.client;
 import com.xiaoba.protocol.Packet;
 import com.xiaoba.protocol.PacketCodeC;
 import com.xiaoba.protocol.request.LoginRequestPacket;
+import com.xiaoba.protocol.response.LoginResponsePacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -26,6 +27,31 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         loginRequestPacket.setUsername("xiaoba");
         loginRequestPacket.setPassword("pwd");
         //编码
-        ByteBuf buffer = PacketCodeC.INSTANCE.encode(ctx.alloc(),loginRequestPacket);
+        ByteBuf buffer = PacketCodeC.INSTANCE.encode(ctx.alloc(), loginRequestPacket);
+
+        // 写数据
+        ctx.channel().writeAndFlush(buffer);
+    }
+
+
+
+    /*
+     * 接收服务端数据，进行逻辑处理
+     * */
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        ByteBuf byteBuf = (ByteBuf) msg;
+        //拿到msg，进行解码操作
+        Packet packet = PacketCodeC.INSTANCE.decode(byteBuf);
+
+        if (packet instanceof LoginResponsePacket) {
+            LoginResponsePacket loginResponsePacket = (LoginResponsePacket) packet;
+            if (loginResponsePacket.isSuccess()) {
+                System.out.println(new Date() + "客户端登录成功");
+            } else {
+                System.out.println(new Date() + "客户端登录失败，原因是:" + loginResponsePacket.getReason());
+            }
+        }
     }
 }
