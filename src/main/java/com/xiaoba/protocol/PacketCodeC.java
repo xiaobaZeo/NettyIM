@@ -50,10 +50,10 @@ public class PacketCodeC {
         serializerMap.put(serializer.getSerializerAlgorithm(), serializer);
     }
 
-    public ByteBuf encode(ByteBufAllocator byteBufAllocator, Packet packet) {
+    public ByteBuf encode(ByteBuf byteBuf, Packet packet) {
         //1、创建ByteBuf对象、调用Netty分配器创建，ioBuffer()返回适配io读写相关内存，他尽可能创建一个直接内存，可以理解不收jvm堆管理的内存空间，写入io缓冲区的效果更好
 //        ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
-        ByteBuf byteBuf = byteBufAllocator.ioBuffer();
+//        ByteBuf byteBuf = byteBufAllocator.ioBuffer();
         //2、序列化Java对象
         byte[] bytes = Serializer.DEFAULT.serialize(packet);
 

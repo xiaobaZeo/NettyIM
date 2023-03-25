@@ -6,7 +6,7 @@ package com.xiaoba.client;
  * @Description : 客户端的启动
  */
 
-import com.sun.org.apache.regexp.internal.RE;
+import com.xiaoba.client.handler.LoginResponseHandler;
 import com.xiaoba.protocol.PacketCodeC;
 import com.xiaoba.protocol.request.MessageRequestPacket;
 import com.xiaoba.util.LoginUtil;
@@ -18,7 +18,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.util.Date;
@@ -47,7 +46,8 @@ public class NettyClient {
                          * 1、pipeline()返回这条连接相关逻辑的处理链，采用责任链模式。
                          * 2、addLost()添加一个逻辑处理器为的就是在客户端建立连接成功 之后，向服务端写数据
                          * */
-                        ch.pipeline().addLast(new ClientHandler());
+//                        ch.pipeline().addLast(new ClientHandler());
+                        ch.pipeline().addLast(new LoginResponseHandler());
                     }
                 });
         //建立连接，通过.addListener监听是否连接成功，因为connect异步、返回一个future
