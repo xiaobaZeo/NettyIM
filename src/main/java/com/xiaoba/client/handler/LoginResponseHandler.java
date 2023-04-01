@@ -8,32 +8,38 @@ package com.xiaoba.client.handler;
 
 import com.xiaoba.protocol.request.LoginRequestPacket;
 import com.xiaoba.protocol.response.LoginResponsePacket;
+import com.xiaoba.util.LoginUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.util.Date;
+import java.util.UUID;
+
 //SimpleChannelInboundHandler类型判断和对象传递
-public class LoginResponseHandler extends SimpleChannelInboundHandler<LoginRequestPacket> {
+public class LoginResponseHandler extends SimpleChannelInboundHandler<LoginResponsePacket> {
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, LoginRequestPacket loginRequestPacket) {
-        System.out.println(new Date() + ": 收到客户端登录请求……");
+    public void channelActive(ChannelHandlerContext ctx) {
+        // 创建登录对象
+        LoginRequestPacket loginRequestPacket = new LoginRequestPacket();
+        loginRequestPacket.setUserId(UUID.randomUUID().toString());
+        loginRequestPacket.setUsername("xiaoba");
+        loginRequestPacket.setPassword("pwd");
 
-        LoginResponsePacket loginResponsePacket = new LoginResponsePacket();
-        loginResponsePacket.setVersion(loginRequestPacket.getVersion());
-        if (valid(loginRequestPacket)) {
-            loginResponsePacket.setSuccess(true);
-            System.out.println(new Date() + ": 登录成功!");
-        } else {
-            loginResponsePacket.setReason("账号密码校验失败");
-            loginResponsePacket.setSuccess(false);
-            System.out.println(new Date() + ": 登录失败!");
-        }
-
-        // 登录响应
-        ctx.channel().writeAndFlush(loginResponsePacket);
+        // 写数据
+        ctx.channel().writeAndFlush(loginRequestPacket);
     }
+@Override
+protected void channelRead0(ChannelHandlerContext ctx, LoginResponsePacket loginResponsePacket) {
+    if (loginResponsePacket.isSuccess()) {
+        System.out.println(new Date() + ": 客户端登录成功");
+        LoginUtil.markAsLogin(ctx.channel());
+    } else {
+        System.out.println(new Date() + ": 客户端登录失败，原因：" + loginResponsePacket.getReason());
+    }
+}
 
-    private boolean valid(LoginRequestPacket loginRequestPacket) {
-        return true;
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) {
+        System.out.println("客户端连接被关闭!");
     }
 }

@@ -7,6 +7,10 @@ package com.xiaoba.client;
  */
 
 import com.xiaoba.client.handler.LoginResponseHandler;
+import com.xiaoba.client.handler.MessageResponseHandler;
+import com.xiaoba.codec.PacketDecoder;
+import com.xiaoba.codec.PacketEncoder;
+import com.xiaoba.codec.Spliter;
 import com.xiaoba.protocol.PacketCodeC;
 import com.xiaoba.protocol.request.MessageRequestPacket;
 import com.xiaoba.util.LoginUtil;
@@ -19,6 +23,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 import java.util.Date;
 import java.util.Scanner;
@@ -47,7 +52,14 @@ public class NettyClient {
                          * 2、addLost()添加一个逻辑处理器为的就是在客户端建立连接成功 之后，向服务端写数据
                          * */
 //                        ch.pipeline().addLast(new ClientHandler());
+                        /*
+                         * 第一个参数指的是数据包的最大长度，第二个参数指的是长度域的偏移量，第三个参数指的是长度域的长度。
+                         * */
+                        ch.pipeline().addLast(new Spliter());
+                        ch.pipeline().addLast(new PacketDecoder());
                         ch.pipeline().addLast(new LoginResponseHandler());
+                        ch.pipeline().addLast(new MessageResponseHandler());
+                        ch.pipeline().addLast(new PacketEncoder());
                     }
                 });
         //建立连接，通过.addListener监听是否连接成功，因为connect异步、返回一个future
@@ -65,6 +77,7 @@ public class NettyClient {
     private static void connect(Bootstrap bootstrap, String host, final int port, int retry) {
         bootstrap.connect(host, port).addListener(future -> {
             if (future.isSuccess()) {
+                System.out.println(new Date() + ": 连接成功，启动控制台线程……");
                 Channel channel = ((ChannelFuture) future).channel();
                 //连接成功启动控制台线程
                 startConsoleThread(channel);
@@ -90,10 +103,11 @@ public class NettyClient {
                     Scanner sc = new Scanner(System.in);
                     String line = sc.nextLine();
 
-                    MessageRequestPacket packet = new MessageRequestPacket();
-                    packet.setMessage(line);
-                    ByteBuf byteBuf = PacketCodeC.INSTANCE.encode(channel.alloc(), packet);
-                    channel.writeAndFlush(byteBuf);
+//                    MessageRequestPacket packet = new MessageRequestPacket();
+//                    packet.setMessage(line);
+//                    ByteBuf byteBuf = PacketCodeC.INSTANCE.encode(channel.alloc(), packet);
+
+                    channel.writeAndFlush(new MessageRequestPacket(line));
                 }
             }
         }).start();

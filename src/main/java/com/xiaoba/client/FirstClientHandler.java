@@ -28,6 +28,12 @@ public class FirstClientHandler extends ChannelInboundHandlerAdapter {
 
         //写数据到服务端
         ctx.channel().writeAndFlush(byteBuf);
+
+        //模拟粘包半包现象
+//        for(int i = 0 ;i < 1000 ; i++){
+//            ByteBuf buffer = getByteBuf(ctx);
+//            ctx.channel().writeAndFlush(buffer);
+//        }
     }
 
     @Override
