@@ -8,9 +8,13 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        /*
+        * 如果已经经过权限认证，就会直接调用remove方法删除自身，这里的this就是AuthHandler这个对象，删除之后，这条客户端链接的逻辑链就不会再有这段逻辑了.
+        * */
         if (!LoginUtil.hasLogin(ctx.channel())) {
             ctx.channel().close();
         } else {
+            ctx.pipeline().remove(this);
             super.channelRead(ctx, msg);
         }
     }

@@ -18,9 +18,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 
 public class NettyServer {
     public static void main(String[] args) {
@@ -29,14 +26,15 @@ public class NettyServer {
         //处理每条连接的数据读写的线程组
         NioEventLoopGroup workerGroup = new NioEventLoopGroup();
         //引导类，引导服务端的启动工作
-        ServerBootstrap serverBootstrap = new ServerBootstrap();
+        final ServerBootstrap serverBootstrap = new ServerBootstrap();
         /*
          * .group()配置两大线程组
          * .channel()指定NIO模型，还有BIO等模型可以选择
          * .childHandler()创建ChannelInitializer对象并在此对象中定义每条连接的数据读写，其中NioSocketChannel和NioServerSocketChannel是对NIO类型的连接抽象。
          * .handler()用于指定在服务端启动过程中的一些逻辑
          * */
-        serverBootstrap.group(bossGroup, workerGroup)
+        serverBootstrap
+                .group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .option(ChannelOption.SO_BACKLOG, 1024)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
