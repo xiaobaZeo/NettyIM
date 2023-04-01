@@ -12,8 +12,10 @@ import com.xiaoba.codec.PacketDecoder;
 import com.xiaoba.codec.PacketEncoder;
 import com.xiaoba.codec.Spliter;
 import com.xiaoba.protocol.PacketCodeC;
+import com.xiaoba.protocol.request.LoginRequestPacket;
 import com.xiaoba.protocol.request.MessageRequestPacket;
 import com.xiaoba.util.LoginUtil;
+import com.xiaoba.util.SessionUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -96,20 +98,51 @@ public class NettyClient {
     }
 
     private static void startConsoleThread(Channel channel) {
+        Scanner sc = new Scanner(System.in);
+        LoginRequestPacket loginRequestPacket = new LoginRequestPacket();
         new Thread(() -> {
             while (!Thread.interrupted()) {
-//                if (LoginUtil.hasLogin(channel)) {
-                    System.out.println("输入消息发送至服务端: ");
-                    Scanner sc = new Scanner(System.in);
-                    String line = sc.nextLine();
+                if (!SessionUtil.hasLogin(channel)) {
+                    System.out.println("输入用户名登录");
+                    String userName = sc.nextLine();
+                    loginRequestPacket.setUsername(userName);
 
-//                    MessageRequestPacket packet = new MessageRequestPacket();
-//                    packet.setMessage(line);
-//                    ByteBuf byteBuf = PacketCodeC.INSTANCE.encode(channel.alloc(), packet);
+                    //暂时默认
+                    loginRequestPacket.setPassword("pwd");
 
-                    channel.writeAndFlush(new MessageRequestPacket(line));
-//                }
+                    //发送登录数据包
+                    channel.writeAndFlush(loginRequestPacket);
+                    waitForLoginResponse();
+                } else {
+                    String toUserId = sc.next();
+                    String message = sc.next();
+                    channel.writeAndFlush(new MessageRequestPacket(toUserId, message));
+                }
             }
         }).start();
+
+//        new Thread(() -> {
+//            while (!Thread.interrupted()) {
+////                if (LoginUtil.hasLogin(channel)) {
+//                    System.out.println("输入消息发送至服务端: ");
+//                    Scanner sc = new Scanner(System.in);
+//                    String line = sc.nextLine();
+//
+////                    MessageRequestPacket packet = new MessageRequestPacket();
+////                    packet.setMessage(line);
+////                    ByteBuf byteBuf = PacketCodeC.INSTANCE.encode(channel.alloc(), packet);
+//
+//                    channel.writeAndFlush(new MessageRequestPacket(line));
+////                }
+//            }
+//        }).start();
+    }
+
+    private static void waitForLoginResponse() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ignored) {
+
+        }
     }
 }

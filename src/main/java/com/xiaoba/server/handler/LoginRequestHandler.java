@@ -8,11 +8,14 @@ package com.xiaoba.server.handler;
 
 import com.xiaoba.protocol.request.LoginRequestPacket;
 import com.xiaoba.protocol.response.LoginResponsePacket;
+import com.xiaoba.session.Session;
 import com.xiaoba.util.LoginUtil;
+import com.xiaoba.util.SessionUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.util.Date;
+import java.util.UUID;
 
 public class LoginRequestHandler extends SimpleChannelInboundHandler<LoginRequestPacket> {
     @Override
@@ -21,10 +24,15 @@ public class LoginRequestHandler extends SimpleChannelInboundHandler<LoginReques
 
         LoginResponsePacket loginResponsePacket = new LoginResponsePacket();
         loginResponsePacket.setVersion(loginRequestPacket.getVersion());
+        loginResponsePacket.setUserName(loginRequestPacket.getUsername());
+
         if (valid(loginRequestPacket)) {
             loginResponsePacket.setSuccess(true);
+            String userId = randomUserId();
+            loginResponsePacket.setUserId(userId);
             System.out.println(new Date() + ": 登录成功!");
-            LoginUtil.markAsLogin(ctx.channel());
+            SessionUtil.bindSession(new Session(userId, loginRequestPacket.getUsername()), ctx.channel());
+//            LoginUtil.markAsLogin(ctx.channel());
         } else {
             loginResponsePacket.setReason("账号密码校验失败");
             loginResponsePacket.setSuccess(false);
@@ -34,8 +42,15 @@ public class LoginRequestHandler extends SimpleChannelInboundHandler<LoginReques
         // 登录响应
         ctx.channel().writeAndFlush(loginResponsePacket);
     }
-
+    private static String randomUserId() {
+        return UUID.randomUUID().toString().split("-")[0];
+    }
     private boolean valid(LoginRequestPacket loginRequestPacket) {
         return true;
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        SessionUtil.unBindSession(ctx.channel());
     }
 }

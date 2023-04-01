@@ -19,12 +19,12 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    @Override
-    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-        if (LoginUtil.hasLogin(ctx.channel())) {
-            System.out.println("当前连接验证完毕，无需再次验证，AuthHandler移除");
-        } else {
-            System.out.println("无法登录验证，强制关闭连接");
-        }
-    }
+//    @Override
+//    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+//        if (LoginUtil.hasLogin(ctx.channel())) {
+//            System.out.println("当前连接验证完毕，无需再次验证，AuthHandler移除");
+//        } else {
+//            System.out.println("无法登录验证，强制关闭连接");
+//        }
+//    }
 }
