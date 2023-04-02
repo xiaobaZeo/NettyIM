@@ -6,7 +6,11 @@ package com.xiaoba.client;
  * @Description : 客户端的启动
  */
 
+import com.xiaoba.client.console.ConsoleCommandManager;
+import com.xiaoba.client.console.LoginConsoleCommand;
+import com.xiaoba.client.handler.CreateGroupResponseHandler;
 import com.xiaoba.client.handler.LoginResponseHandler;
+import com.xiaoba.client.handler.LogoutResponseHandler;
 import com.xiaoba.client.handler.MessageResponseHandler;
 import com.xiaoba.codec.PacketDecoder;
 import com.xiaoba.codec.PacketEncoder;
@@ -60,7 +64,9 @@ public class NettyClient {
                         ch.pipeline().addLast(new Spliter());
                         ch.pipeline().addLast(new PacketDecoder());
                         ch.pipeline().addLast(new LoginResponseHandler());
+                        ch.pipeline().addLast(new LogoutResponseHandler());
                         ch.pipeline().addLast(new MessageResponseHandler());
+                        ch.pipeline().addLast(new CreateGroupResponseHandler());
                         ch.pipeline().addLast(new PacketEncoder());
                     }
                 });
@@ -98,25 +104,32 @@ public class NettyClient {
     }
 
     private static void startConsoleThread(Channel channel) {
+        ConsoleCommandManager consoleCommandManager = new ConsoleCommandManager();
+        LoginConsoleCommand loginConsoleCommand = new LoginConsoleCommand();
         Scanner sc = new Scanner(System.in);
-        LoginRequestPacket loginRequestPacket = new LoginRequestPacket();
+//        LoginRequestPacket loginRequestPacket = new LoginRequestPacket();
         new Thread(() -> {
             while (!Thread.interrupted()) {
+//                if (!SessionUtil.hasLogin(channel)) {
+//                    System.out.println("输入用户名登录");
+//                    String userName = sc.nextLine();
+//                    loginRequestPacket.setUsername(userName);
+//
+//                    //暂时默认
+//                    loginRequestPacket.setPassword("pwd");
+//
+//                    //发送登录数据包
+//                    channel.writeAndFlush(loginRequestPacket);
+//                    waitForLoginResponse();
+//                } else {
+//                    String toUserId = sc.next();
+//                    String message = sc.next();
+//                    channel.writeAndFlush(new MessageRequestPacket(toUserId, message));
+//                }
                 if (!SessionUtil.hasLogin(channel)) {
-                    System.out.println("输入用户名登录");
-                    String userName = sc.nextLine();
-                    loginRequestPacket.setUsername(userName);
-
-                    //暂时默认
-                    loginRequestPacket.setPassword("pwd");
-
-                    //发送登录数据包
-                    channel.writeAndFlush(loginRequestPacket);
-                    waitForLoginResponse();
+                    loginConsoleCommand.exec(sc, channel);
                 } else {
-                    String toUserId = sc.next();
-                    String message = sc.next();
-                    channel.writeAndFlush(new MessageRequestPacket(toUserId, message));
+                    consoleCommandManager.exec(sc, channel);
                 }
             }
         }).start();

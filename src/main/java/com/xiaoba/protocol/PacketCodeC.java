@@ -6,9 +6,13 @@ package com.xiaoba.protocol;
  * @Description : 封装二进制
  */
 
+import com.xiaoba.protocol.request.CreateGroupRequestPacket;
 import com.xiaoba.protocol.request.LoginRequestPacket;
+import com.xiaoba.protocol.request.LogoutRequestPacket;
 import com.xiaoba.protocol.request.MessageRequestPacket;
+import com.xiaoba.protocol.response.CreateGroupResponsePacket;
 import com.xiaoba.protocol.response.LoginResponsePacket;
+import com.xiaoba.protocol.response.LogoutResponsePacket;
 import com.xiaoba.protocol.response.MessageResponsePacket;
 import com.xiaoba.serialize.Serializer;
 import com.xiaoba.serialize.impl.JSONSerializer;
@@ -44,6 +48,10 @@ public class PacketCodeC {
         packetTypeMap.put(LOGIN_RESPONSE, LoginResponsePacket.class);
         packetTypeMap.put(MESSAGE_REQUEST, MessageRequestPacket.class);
         packetTypeMap.put(MESSAGE_RESPONSE, MessageResponsePacket.class);
+        packetTypeMap.put(LOGOUT_REQUEST, LogoutRequestPacket.class);
+        packetTypeMap.put(LOGOUT_RESPONSE, LogoutResponsePacket.class);
+        packetTypeMap.put(CREATE_GROUP_REQUEST, CreateGroupRequestPacket.class);
+        packetTypeMap.put(CREATE_GROUP_RESPONSE, CreateGroupResponsePacket.class);
 
         serializerMap = new HashMap<>();
         Serializer serializer = new JSONSerializer();

@@ -9,9 +9,7 @@ package com.xiaoba.server;
 import com.xiaoba.codec.PacketDecoder;
 import com.xiaoba.codec.PacketEncoder;
 import com.xiaoba.codec.Spliter;
-import com.xiaoba.server.handler.AuthHandler;
-import com.xiaoba.server.handler.LoginRequestHandler;
-import com.xiaoba.server.handler.MessageRequestHandler;
+import com.xiaoba.server.handler.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -51,8 +49,9 @@ public class NettyServer {
                         ch.pipeline().addLast(new LoginRequestHandler());
                         ch.pipeline().addLast(new AuthHandler());
                         ch.pipeline().addLast(new MessageRequestHandler());
+                        ch.pipeline().addLast(new CreateGroupRequestHandler());
+                        ch.pipeline().addLast(new LogoutRequestHandler());
                         ch.pipeline().addLast(new PacketEncoder());
-
                     }
 
                     ;
