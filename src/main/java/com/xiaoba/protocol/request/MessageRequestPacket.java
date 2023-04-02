@@ -19,9 +19,9 @@ public class MessageRequestPacket extends Packet {
     private String message;
     private String toUserId;
 
-    public MessageRequestPacket(String message) {
-        this.message = message;
-    }
+//    public MessageRequestPacket(String message) {
+//        this.message = message;
+//    }
     public MessageRequestPacket(String toUserId, String message) {
         this.toUserId = toUserId;
         this.message = message;
