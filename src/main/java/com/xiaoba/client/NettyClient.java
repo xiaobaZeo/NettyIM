@@ -8,10 +8,7 @@ package com.xiaoba.client;
 
 import com.xiaoba.client.console.ConsoleCommandManager;
 import com.xiaoba.client.console.LoginConsoleCommand;
-import com.xiaoba.client.handler.CreateGroupResponseHandler;
-import com.xiaoba.client.handler.LoginResponseHandler;
-import com.xiaoba.client.handler.LogoutResponseHandler;
-import com.xiaoba.client.handler.MessageResponseHandler;
+import com.xiaoba.client.handler.*;
 import com.xiaoba.codec.PacketDecoder;
 import com.xiaoba.codec.PacketEncoder;
 import com.xiaoba.codec.Spliter;
@@ -68,6 +65,7 @@ public class NettyClient {
                         ch.pipeline().addLast(new MessageResponseHandler());
                         ch.pipeline().addLast(new CreateGroupResponseHandler());
                         ch.pipeline().addLast(new PacketEncoder());
+                        ch.pipeline().addLast(new JoinGroupResponseHandler());
                     }
                 });
         //建立连接，通过.addListener监听是否连接成功，因为connect异步、返回一个future
