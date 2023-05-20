@@ -6,6 +6,7 @@ package com.xiaoba.server;
  * @Description : 服务端启动流程
  */
 
+import com.xiaoba.codec.PacketCodecHandler;
 import com.xiaoba.codec.PacketDecoder;
 import com.xiaoba.codec.PacketEncoder;
 import com.xiaoba.codec.Spliter;
@@ -44,15 +45,20 @@ public class NettyServer {
                          * 第一个参数指的是数据包的最大长度，第二个参数指的是长度域的偏移量，第三个参数指的是长度域的长度。
                          * */
 //                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 7, 4));
+//                        ch.pipeline().addLast(new Spliter());
+//                        ch.pipeline().addLast(new PacketDecoder());
+//                        ch.pipeline().addLast(new LoginRequestHandler());
+//                        ch.pipeline().addLast(new AuthHandler());
+//                        ch.pipeline().addLast(new MessageRequestHandler());
+//                        ch.pipeline().addLast(new CreateGroupRequestHandler());
+//                        ch.pipeline().addLast(new LogoutRequestHandler());
+//                        ch.pipeline().addLast(new PacketEncoder());
+//                        ch.pipeline().addLast(new JoinGroupRequestHandler());
                         ch.pipeline().addLast(new Spliter());
-                        ch.pipeline().addLast(new PacketDecoder());
-                        ch.pipeline().addLast(new LoginRequestHandler());
-                        ch.pipeline().addLast(new AuthHandler());
-                        ch.pipeline().addLast(new MessageRequestHandler());
-                        ch.pipeline().addLast(new CreateGroupRequestHandler());
-                        ch.pipeline().addLast(new LogoutRequestHandler());
-                        ch.pipeline().addLast(new PacketEncoder());
-                        ch.pipeline().addLast(new JoinGroupRequestHandler());
+                        ch.pipeline().addLast(PacketCodecHandler.INSTANCE);
+                        ch.pipeline().addLast(LoginRequestHandler.INSTANCE);
+                        ch.pipeline().addLast(AuthHandler.INSTANCE);
+                        ch.pipeline().addLast(IMHandler.INSTANCE);
                     }
 
                     ;

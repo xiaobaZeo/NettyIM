@@ -58,14 +58,33 @@ public class NettyClient {
                         /*
                          * 第一个参数指的是数据包的最大长度，第二个参数指的是长度域的偏移量，第三个参数指的是长度域的长度。
                          * */
+//                        ch.pipeline().addLast(new Spliter());
+//                        ch.pipeline().addLast(new PacketDecoder());
+//                        ch.pipeline().addLast(new LoginResponseHandler());
+//                        ch.pipeline().addLast(new LogoutResponseHandler());
+//                        ch.pipeline().addLast(new MessageResponseHandler());
+//                        ch.pipeline().addLast(new CreateGroupResponseHandler());
+//                        ch.pipeline().addLast(new PacketEncoder());
+//                        ch.pipeline().addLast(new JoinGroupResponseHandler());
                         ch.pipeline().addLast(new Spliter());
                         ch.pipeline().addLast(new PacketDecoder());
+                        // 登录响应处理器
                         ch.pipeline().addLast(new LoginResponseHandler());
-                        ch.pipeline().addLast(new LogoutResponseHandler());
+                        // 收消息处理器
                         ch.pipeline().addLast(new MessageResponseHandler());
+                        // 创建群响应处理器
                         ch.pipeline().addLast(new CreateGroupResponseHandler());
-                        ch.pipeline().addLast(new PacketEncoder());
+                        // 加群响应处理器
                         ch.pipeline().addLast(new JoinGroupResponseHandler());
+                        // 退群响应处理器
+                        ch.pipeline().addLast(new QuitGroupResponseHandler());
+                        // 获取群成员响应处理器
+                        ch.pipeline().addLast(new ListGroupMembersResponseHandler());
+                        // 群消息响应
+                        ch.pipeline().addLast(new GroupMessageResponseHandler());
+                        // 登出响应处理器
+                        ch.pipeline().addLast(new LogoutResponseHandler());
+                        ch.pipeline().addLast(new PacketEncoder());
                     }
                 });
         //建立连接，通过.addListener监听是否连接成功，因为connect异步、返回一个future

@@ -6,14 +6,8 @@ package com.xiaoba.protocol;
  * @Description : 封装二进制
  */
 
-import com.xiaoba.protocol.request.CreateGroupRequestPacket;
-import com.xiaoba.protocol.request.LoginRequestPacket;
-import com.xiaoba.protocol.request.LogoutRequestPacket;
-import com.xiaoba.protocol.request.MessageRequestPacket;
-import com.xiaoba.protocol.response.CreateGroupResponsePacket;
-import com.xiaoba.protocol.response.LoginResponsePacket;
-import com.xiaoba.protocol.response.LogoutResponsePacket;
-import com.xiaoba.protocol.response.MessageResponsePacket;
+import com.xiaoba.protocol.request.*;
+import com.xiaoba.protocol.response.*;
 import com.xiaoba.serialize.Serializer;
 import com.xiaoba.serialize.impl.JSONSerializer;
 import io.netty.buffer.ByteBuf;
@@ -52,6 +46,14 @@ public class PacketCodeC {
         packetTypeMap.put(LOGOUT_RESPONSE, LogoutResponsePacket.class);
         packetTypeMap.put(CREATE_GROUP_REQUEST, CreateGroupRequestPacket.class);
         packetTypeMap.put(CREATE_GROUP_RESPONSE, CreateGroupResponsePacket.class);
+        packetTypeMap.put(JOIN_GROUP_REQUEST, JoinGroupRequestPacket.class);
+        packetTypeMap.put(JOIN_GROUP_RESPONSE, JoinGroupResponsePacket.class);
+        packetTypeMap.put(QUIT_GROUP_REQUEST, QuitGroupRequestPacket.class);
+        packetTypeMap.put(QUIT_GROUP_RESPONSE, QuitGroupResponsePacket.class);
+        packetTypeMap.put(LIST_GROUP_MEMBERS_REQUEST, ListGroupMembersRequestPacket.class);
+        packetTypeMap.put(LIST_GROUP_MEMBERS_RESPONSE, ListGroupMembersResponsePacket.class);
+        packetTypeMap.put(GROUP_MESSAGE_REQUEST, GroupMessageRequestPacket.class);
+        packetTypeMap.put(GROUP_MESSAGE_RESPONSE, GroupMessageResponsePacket.class);
 
         serializerMap = new HashMap<>();
         Serializer serializer = new JSONSerializer();
